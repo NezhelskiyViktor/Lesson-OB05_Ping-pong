@@ -1,13 +1,9 @@
-import random
-
 import pygame
 import sys
 from random import *
 
 start_game = False
-top_bar_x = 220
-bottom_bar_x = 220
-
+speed_bar = 10
 
 class Ball:
     def __init__(self, x, y):
@@ -15,6 +11,7 @@ class Ball:
         self._y = y
         self._vx = 0
         self._vy = 0
+        self.hitbox = pygame.Rect(self._x - 20, self._y - 20, 40, 40)
         self.rect = pygame.draw.circle(screen, WHITE, (self._x, self._y), 20)
 
     def set_speed(self, speed):
@@ -26,11 +23,19 @@ class Ball:
     def move(self):
         self._x += self._vx
         self._y += self._vy
+        self.hitbox = pygame.Rect(self._x - 20, self._y - 20, 40, 40)
         self.rect = pygame.draw.circle(screen, WHITE, (self._x, self._y), 20)
         # Проверка на столкновение с Bar
-        if (self._y < 50 and self._x > top_bar_x and self._x < top_bar_x + 160) or \
-                (self._y > 750 and self._x > bottom_bar_x and self._x < bottom_bar_x + 160):
+        collision_top = self.hitbox.colliderect(top_bar.hitbox)
+        if collision_top:
+            collision_top = False
             self._vy = -self._vy
+            self._vx = self._vx + top_bar._vx // 5
+        collision_bottom = self.hitbox.colliderect(bottom_bar.hitbox)
+        if collision_bottom:
+            collision_bottom = False
+            self._vy = -self._vy
+            self._vx = self._vx + bottom_bar._vx // 5
         # Проверка на выход на границы экрана
         if self._y < 11 or self._y > 789:
             global start_game
@@ -38,6 +43,7 @@ class Ball:
             self.set_speed((0, 0))
         if self._x < 21 or self._x > 579:
             self._vx = -self._vx
+        self.hitbox = pygame.Rect(self._x - 20, self._y - 20, 40, 40)
         return self._x
 
 
@@ -46,13 +52,15 @@ class Bar:
         self._x = 220
         self._y = y
         self._vx = 0
-        self.rect = pygame.draw.rect(screen, WHITE, (self._x, self._y, 160, 10))
+        self.hitbox = pygame.Rect(self._x, self._y, 160, 10)
+        self.rect = pygame.draw.rect(screen, WHITE, self.hitbox)
 
     def move(self):
         self._x += self._vx
         if self._x < 0 or self._x > 440:
             self._vx = 0
-        self.rect = pygame.draw.rect(screen, WHITE, (self._x, self._y, 160, 10))
+        self.hitbox = pygame.Rect(self._x, self._y, 160, 10)
+        self.rect = pygame.draw.rect(screen, WHITE, self.hitbox)
         return self._x
 
     def set_speed(self, speed):
@@ -73,7 +81,7 @@ def draw_text(surface, text, y):
 
 pygame.init()
 pygame.mouse.set_visible(False)
-FPS = 50
+FPS = 20
 clock = pygame.time.Clock()
 
 # Определение цветов
@@ -105,8 +113,7 @@ while running:
                 start_game = not start_game
                 if start_game:
                     game_with_computer = (event.key == pygame.K_SPACE)
-                    ball.set_speed((choice([-3, -2, -1, 1, 2, 3]),
-                                    choice([-6, -5, -4, -3,  3, 4, 5, 6])))
+                    ball.set_speed((choice([-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]), 13))
                     ball.set_x_y()
                     top_bar.set_speed(0)
                     bottom_bar.set_speed(0)
@@ -119,16 +126,16 @@ while running:
                     bottom_bar.set_x(220)
             # Обработка нажатия клавиш игроками
             if event.key == pygame.K_RIGHT:
-                bottom_bar.set_speed(5)
+                bottom_bar.set_speed(speed_bar)
             elif event.key == pygame.K_LEFT:
-                bottom_bar.set_speed(-5)
+                bottom_bar.set_speed(-speed_bar)
             elif event.key == pygame.K_DOWN:
                 bottom_bar.set_speed(0)
 
             if event.key == pygame.K_d:
-                top_bar.set_speed(5)
+                top_bar.set_speed(speed_bar)
             elif event.key == pygame.K_a:
-                top_bar.set_speed(-5)
+                top_bar.set_speed(-speed_bar)
             elif event.key == pygame.K_s:
                 top_bar.set_speed(0)
     # Обновление экрана
@@ -143,8 +150,8 @@ while running:
         top_bar.set_x(ball.move() - 80)
     else:
         ball.move()
-    top_bar_x = top_bar.move()
-    bottom_bar_x = bottom_bar.move()
+    top_bar.move()
+    bottom_bar.move()
 
     pygame.display.flip()
     clock.tick(FPS)
