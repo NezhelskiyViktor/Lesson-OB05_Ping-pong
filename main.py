@@ -3,7 +3,7 @@ import sys
 from random import *
 
 start_game = False
-speed_bar = 10
+speed_bars = 10
 
 class Ball:
     def __init__(self, x, y):
@@ -73,7 +73,7 @@ class Bar:
 def draw_text(surface, text, y):
     _font_name = pygame.font.match_font('arial')
     _font = pygame.font.SysFont(_font_name, 24)
-    _text_surface = _font.render(text, True, RED)
+    _text_surface = _font.render(text, True, YELLOW)
     _text_rect = _text_surface.get_rect()
     _text_rect.midtop = (300, y)
     surface.blit(_text_surface, _text_rect)
@@ -87,7 +87,7 @@ clock = pygame.time.Clock()
 # Определение цветов
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
 
 # Создание экрана
 screen = pygame.display.set_mode((600, 800))
@@ -126,16 +126,16 @@ while running:
                     bottom_bar.set_x(220)
             # Обработка нажатия клавиш игроками
             if event.key == pygame.K_RIGHT:
-                bottom_bar.set_speed(speed_bar)
+                bottom_bar.set_speed(speed_bars)
             elif event.key == pygame.K_LEFT:
-                bottom_bar.set_speed(-speed_bar)
+                bottom_bar.set_speed(-speed_bars)
             elif event.key == pygame.K_DOWN:
                 bottom_bar.set_speed(0)
 
             if event.key == pygame.K_d:
-                top_bar.set_speed(speed_bar)
+                top_bar.set_speed(speed_bars)
             elif event.key == pygame.K_a:
-                top_bar.set_speed(-speed_bar)
+                top_bar.set_speed(-speed_bars)
             elif event.key == pygame.K_s:
                 top_bar.set_speed(0)
     # Обновление экрана
