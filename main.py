@@ -52,14 +52,16 @@ class Bar:
         self._x = 220
         self._y = y
         self._vx = 0
-        self.hitbox = pygame.Rect(self._x, self._y, 160, 10)
+        self._width = 160
+        self._height = 10
+        self.hitbox = pygame.Rect(self._x, self._y, self._width, self._height)
         self.rect = pygame.draw.rect(screen, WHITE, self.hitbox)
 
     def move(self):
         self._x += self._vx
-        if self._x < 0 or self._x > 440:
+        if self._x < 0 or self._x > 600 - self._width:
             self._vx = 0
-        self.hitbox = pygame.Rect(self._x, self._y, 160, 10)
+        self.hitbox = pygame.Rect(self._x, self._y, self._width, self._height)
         self.rect = pygame.draw.rect(screen, WHITE, self.hitbox)
         return self._x
 
@@ -67,7 +69,7 @@ class Bar:
         self._vx = speed
 
     def set_x(self, x):
-        self._x = x
+        self._x = x - self._width // 2
 
 
 def draw_text(surface, text, y):
@@ -113,7 +115,7 @@ while running:
                 start_game = not start_game
                 if start_game:
                     game_with_computer = (event.key == pygame.K_SPACE)
-                    ball.set_speed((choice([-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6]), 13))
+                    ball.set_speed((choice([-6, -5, -4, -3, -2, -1, 0,1, 2, 3, 4, 5, 6]), choice([-13,-12, 12, 13])))
                     ball.set_x_y()
                     top_bar.set_speed(0)
                     bottom_bar.set_speed(0)
@@ -121,9 +123,9 @@ while running:
                     ball.set_speed((0, 0))
                     ball.set_x_y()
                     top_bar.set_speed(0)
-                    top_bar.set_x(220)
+                    top_bar.set_x(300)
                     bottom_bar.set_speed(0)
-                    bottom_bar.set_x(220)
+                    bottom_bar.set_x(300)
             # Обработка нажатия клавиш игроками
             if event.key == pygame.K_RIGHT:
                 bottom_bar.set_speed(speed_bars)
@@ -147,7 +149,7 @@ while running:
         draw_text(screen, "Если игра с компьютером нажмите <Пробел>,", 200)
         draw_text(screen, "если игра с человеком нажмите <Enter>", 220)
     if game_with_computer:
-        top_bar.set_x(ball.move() - 80)
+        top_bar.set_x(ball.move())
     else:
         ball.move()
     top_bar.move()
